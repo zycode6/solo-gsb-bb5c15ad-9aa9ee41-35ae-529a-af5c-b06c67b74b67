@@ -1,0 +1,16 @@
+{
+  "name": "stage-walk-check",
+  "version": "1.0.0",
+  "description": "舞台走位校验 Web 应用：建立带通行耗时的舞台区域连接图，按时间校验演员到位口令的可达性",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

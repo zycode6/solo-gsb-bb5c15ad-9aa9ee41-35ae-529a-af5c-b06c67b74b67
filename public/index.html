@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>舞台走位校验</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">🎭</span>
+      <div>
+        <h1>舞台走位校验</h1>
+        <p>区域连接图 × 到位口令时间轴 · 最短耗时自动核算</p>
+      </div>
+    </div>
+    <div class="actions">
+      <span id="save-status" class="save-status" title="最近一次保存状态"></span>
+      <button id="btn-report-md" class="btn" title="下载 Markdown 校验报告">⬇ 导出报告(MD)</button>
+      <button id="btn-report-json" class="btn btn-ghost" title="下载 JSON 校验报告">⬇ JSON</button>
+      <button id="btn-recheck" class="btn btn-ghost" title="重新计算全部区段">↻ 重新校验</button>
+      <button id="btn-reset" class="btn btn-danger-ghost" title="放弃当前数据，恢复内置示例">重置示例</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- 左：建模面板 -->
+    <aside class="sidebar">
+      <nav class="tabs">
+        <button class="tab active" data-tab="areas">区域</button>
+        <button class="tab" data-tab="edges">连接</button>
+        <button class="tab" data-tab="actors">演员</button>
+        <button class="tab" data-tab="cues">口令</button>
+      </nav>
+
+      <section id="panel-areas" class="panel active">
+        <form id="form-area" class="add-form">
+          <input name="name" placeholder="区域名称，如：左后区" required maxlength="40" />
+          <button class="btn btn-primary btn-sm" type="submit">＋ 添加区域</button>
+        </form>
+        <p class="hint">提示：在中间画布上可直接<b>拖动区域</b>调整位置；双击区域可改名。</p>
+        <ul id="list-areas" class="item-list"></ul>
+      </section>
+
+      <section id="panel-edges" class="panel">
+        <form id="form-edge" class="add-form add-form-grid">
+          <label>起点
+            <select name="from" required></select>
+          </label>
+          <label>终点
+            <select name="to" required></select>
+          </label>
+          <label>通行秒数
+            <input name="seconds" type="number" min="0" step="1" value="10" required />
+          </label>
+          <label class="check-label">
+            <input type="checkbox" name="directed" /> 单向（仅 起点→终点）
+          </label>
+          <button class="btn btn-primary btn-sm" type="submit">＋ 添加连接</button>
+        </form>
+        <p class="hint">不勾选“单向”时连接双向可通行；同两个区域间可建多条连接，计算时取最短。</p>
+        <ul id="list-edges" class="item-list"></ul>
+      </section>
+
+      <section id="panel-actors" class="panel">
+        <form id="form-actor" class="add-form">
+          <input name="name" placeholder="演员名称，如：演员甲" required maxlength="40" />
+          <input name="color" type="color" value="#6366f1" title="标记颜色" />
+          <button class="btn btn-primary btn-sm" type="submit">＋ 添加演员</button>
+        </form>
+        <ul id="list-actors" class="item-list"></ul>
+      </section>
+
+      <section id="panel-cues" class="panel">
+        <form id="form-cue" class="add-form add-form-grid">
+          <label>演员
+            <select name="actorId" required></select>
+          </label>
+          <label>到位时间
+            <input name="time" placeholder="HH:MM:SS 或 MM:SS" required pattern="^\d+(:[0-5]?\d){0,2}$|^\d+(\.\d+)?$" title="支持 HH:MM:SS、MM:SS 或纯秒数" />
+          </label>
+          <label>到位区域
+            <select name="areaId" required></select>
+          </label>
+          <label class="wide">备注
+            <input name="note" maxlength="200" placeholder="如：第一幕对戏位" />
+          </label>
+          <button class="btn btn-primary btn-sm" type="submit">＋ 添加口令</button>
+        </form>
+        <p class="hint">系统按时间自动排序，逐段校验相邻口令间的最短通行耗时。</p>
+        <ul id="list-cues" class="item-list"></ul>
+      </section>
+    </aside>
+
+    <!-- 中：连接图画布 -->
+    <section class="canvas-wrap">
+      <div class="canvas-toolbar">
+        <h2>舞台区域连接图</h2>
+        <div class="legend">
+          <span><i class="dot ok"></i>绿色路径 = 可按时抵达</span>
+          <span><i class="dot bad"></i>红色路径 = 无法按时抵达</span>
+          <span><i class="dot dash"></i>虚线 = 单向连接</span>
+          <span class="legend-tip">点击右侧区段可在图上高亮路径</span>
+        </div>
+      </div>
+      <svg id="stage-svg" viewBox="0 0 800 480" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"></path>
+          </marker>
+          <marker id="arrow-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#ef4444"></path>
+          </marker>
+          <marker id="arrow-ok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#16a34a"></path>
+          </marker>
+        </defs>
+        <g id="g-edges"></g>
+        <g id="g-edge-labels"></g>
+        <g id="g-areas"></g>
+      </svg>
+    </section>
+
+    <!-- 右：校验结果 -->
+    <aside class="results">
+      <div id="summary" class="summary"></div>
+      <div id="actor-results" class="actor-results"></div>
+    </aside>
+  </main>
+
+  <div id="toast" class="toast" hidden></div>
+  <script src="/app.js"></script>
+</body>
+</html>

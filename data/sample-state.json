@@ -1,0 +1,46 @@
+{
+  "areas": [
+    { "id": "a1", "name": "上场门(西)", "x": 60, "y": 260 },
+    { "id": "a2", "name": "上场门(东)", "x": 740, "y": 260 },
+    { "id": "a3", "name": "左后区", "x": 220, "y": 120 },
+    { "id": "a4", "name": "右后区", "x": 580, "y": 120 },
+    { "id": "a5", "name": "表演中区", "x": 400, "y": 260 },
+    { "id": "a6", "name": "台口", "x": 400, "y": 400 },
+    { "id": "a7", "name": "高台", "x": 580, "y": 390 },
+    { "id": "a8", "name": "乐池入口", "x": 200, "y": 430 }
+  ],
+  "edges": [
+    { "id": "e1", "from": "a1", "to": "a3", "seconds": 12, "directed": false },
+    { "id": "e2", "from": "a1", "to": "a5", "seconds": 18, "directed": false },
+    { "id": "e3", "from": "a2", "to": "a4", "seconds": 12, "directed": false },
+    { "id": "e4", "from": "a2", "to": "a5", "seconds": 18, "directed": false },
+    { "id": "e5", "from": "a2", "to": "a7", "seconds": 20, "directed": false },
+    { "id": "e6", "from": "a3", "to": "a4", "seconds": 22, "directed": false },
+    { "id": "e7", "from": "a3", "to": "a5", "seconds": 10, "directed": false },
+    { "id": "e8", "from": "a4", "to": "a5", "seconds": 10, "directed": false },
+    { "id": "e9", "from": "a5", "to": "a6", "seconds": 8, "directed": false },
+    { "id": "e10", "from": "a5", "to": "a7", "seconds": 14, "directed": false },
+    { "id": "e11", "from": "a6", "to": "a7", "seconds": 12, "directed": false },
+    { "id": "e12", "from": "a8", "to": "a3", "seconds": 30, "directed": true }
+  ],
+  "actors": [
+    { "id": "p1", "name": "演员甲", "color": "#6366f1" },
+    { "id": "p2", "name": "演员乙", "color": "#ec4899" },
+    { "id": "p3", "name": "演员丙", "color": "#0ea5e9" }
+  ],
+  "cues": [
+    { "id": "c1", "actorId": "p1", "time": "00:00:00", "areaId": "a1", "note": "幕启，西上场门候场" },
+    { "id": "c2", "actorId": "p1", "time": "00:00:20", "areaId": "a5", "note": "第一幕对戏位（中区需18秒，刚好抵达）" },
+    { "id": "c3", "actorId": "p1", "time": "00:00:35", "areaId": "a6", "note": "台口独白（中区→台口8秒，余7秒）" },
+    { "id": "c4", "actorId": "p1", "time": "00:00:45", "areaId": "a7", "note": "登高台造型" },
+
+    { "id": "c5", "actorId": "p2", "time": "00:00:05", "areaId": "a2", "note": "东上场门入场" },
+    { "id": "c6", "actorId": "p2", "time": "00:00:15", "areaId": "a5", "note": "10秒内赶到中区（需18秒，时间不足示例）" },
+    { "id": "c7", "actorId": "p2", "time": "00:01:10", "areaId": "a3", "note": "转场左后区（中区直达10秒，时间充裕）" },
+    { "id": "c8", "actorId": "p2", "time": "00:01:40", "areaId": "a8", "note": "下场进乐池（乐池仅有出向单向道，无法进入，不连通示例）" },
+
+    { "id": "c9", "actorId": "p3", "time": "00:00:10", "areaId": "a8", "note": "乐池内乐手起身" },
+    { "id": "c10", "actorId": "p3", "time": "00:00:40", "areaId": "a3", "note": "沿单向登台道上台（a8→a3 需30秒，余10秒，可抵达）" },
+    { "id": "c11", "actorId": "p3", "time": "00:01:00", "areaId": "a8", "note": "返回乐池（登台道为单向，台上无路回乐池，不连通示例）" }
+  ]
+}

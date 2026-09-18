@@ -1,0 +1,20 @@
+services:
+  stage-walk-check:
+    build: .
+    image: stage-walk-check:latest
+    container_name: stage-walk-check
+    # 宿主机端口可用环境变量覆盖： PORT=8080 docker compose up -d
+    ports:
+      - "${PORT:-3000}:3000"
+    volumes:
+      # 命名卷持久化用户编辑后的数据（state.json）；卷为空时自动初始化为内置示例
+      - stage-data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  stage-data:
